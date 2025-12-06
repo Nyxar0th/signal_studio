@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { Signal } from "../types/signal";
 
 interface Signal_card_props {
@@ -42,7 +43,14 @@ export function Signal_card({ signal }: Signal_card_props) {
     signal.error_rate >= 100 ? "100%" : `${signal.error_rate.toFixed(1)}%`;
 
   return (
-    <div className="rounded-xl border border-[#27272f] bg-[#26272b] p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 220, damping: 22, mass: 0.9 }}
+      className="rounded-xl border border-[#27272f] bg-[#26272b] p-4 sm:p-5 shadow-sm flex flex-col gap-3"
+    >
       {/* top row */}
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
@@ -54,7 +62,8 @@ export function Signal_card({ signal }: Signal_card_props) {
           </p>
         </div>
 
-        <div
+        <motion.div
+          layout
           className={[
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium",
             status_styles.pill_class
@@ -66,7 +75,7 @@ export function Signal_card({ signal }: Signal_card_props) {
           <span className="uppercase tracking-[0.14em]">
             {status_styles.label}
           </span>
-        </div>
+        </motion.div>
       </div>
 
       {/* middle metrics */}
@@ -75,12 +84,15 @@ export function Signal_card({ signal }: Signal_card_props) {
           <p className="text-[11px] text-[#9ca3af] uppercase tracking-[0.16em]">
             load_pct
           </p>
-          <p className="text-xl font-semibold text-[#e5e7eb]">
+          <motion.p
+            layout
+            className="text-xl font-semibold text-[#e5e7eb]"
+          >
             {signal.load_pct}
             <span className="text-xs text-[#9ca3af] ml-1">
               %
             </span>
-          </p>
+          </motion.p>
         </div>
 
         <div className="flex gap-6 text-xs sm:text-[13px]">
@@ -88,17 +100,17 @@ export function Signal_card({ signal }: Signal_card_props) {
             <p className="text-[11px] text-[#9ca3af] uppercase tracking-[0.16em]">
               latency
             </p>
-            <p className="text-[#e5e7eb]">
+            <motion.p layout className="text-[#e5e7eb]">
               {latency_label}
-            </p>
+            </motion.p>
           </div>
           <div className="space-y-1">
             <p className="text-[11px] text-[#9ca3af] uppercase tracking-[0.16em]">
               error_rate
             </p>
-            <p className="text-[#e5e7eb]">
+            <motion.p layout className="text-[#e5e7eb]">
               {error_label}
-            </p>
+            </motion.p>
           </div>
         </div>
       </div>
@@ -106,15 +118,17 @@ export function Signal_card({ signal }: Signal_card_props) {
       {/* load bar */}
       <div className="mt-1 space-y-1.5">
         <div className="h-1.5 w-full rounded-full bg-[#18181b] overflow-hidden">
-          <div
+          <motion.div
+            initial={false}
+            animate={{ width: `${load_width}%` }}
+            transition={{ type: "spring", stiffness: 260, damping: 26 }}
             className="h-full rounded-full bg-gradient-to-r from-sky-400 via-sky-500 to-sky-300"
-            style={{ width: `${load_width}%` }}
           />
         </div>
         <p className="text-[11px] text-[#6b7280]">
           load_bar_preview_only_for_now
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
