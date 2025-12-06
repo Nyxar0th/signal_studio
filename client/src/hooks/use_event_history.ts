@@ -25,7 +25,6 @@ export function use_event_history(
   const [events, set_events] = useState<Signal_event[]>([]);
   const prev_ref = useRef<Record<string, Signal> | null>(null);
 
-  // helper to add event and trim list
   const push_event = (event: Signal_event) => {
     set_events((old) => {
       const next = [event, ...old];
@@ -41,6 +40,7 @@ export function use_event_history(
 
     const prev_map = prev_ref.current;
     const next_map: Record<string, Signal> = {};
+    const now = Date.now();
 
     signals.forEach((signal) => {
       next_map[signal.id] = signal;
@@ -54,7 +54,7 @@ export function use_event_history(
           id: crypto.randomUUID(),
           signal_id: signal.id,
           label: signal.label,
-          timestamp: Date.now(),
+          timestamp: now,
           type: "status_change",
           note: `${prev.status} → ${signal.status}`
         });
@@ -69,7 +69,7 @@ export function use_event_history(
           id: crypto.randomUUID(),
           signal_id: signal.id,
           label: signal.label,
-          timestamp: Date.now(),
+          timestamp: now,
           type: "spike_load",
           note: `Load spiked to ${signal.load_pct}%`
         });
@@ -84,7 +84,7 @@ export function use_event_history(
           id: crypto.randomUUID(),
           signal_id: signal.id,
           label: signal.label,
-          timestamp: Date.now(),
+          timestamp: now,
           type: "spike_latency",
           note: `Latency reached ${signal.latency_ms} ms`
         });
@@ -99,7 +99,7 @@ export function use_event_history(
           id: crypto.randomUUID(),
           signal_id: signal.id,
           label: signal.label,
-          timestamp: Date.now(),
+          timestamp: now,
           type: "spike_error",
           note: `Error spike: ${signal.error_rate.toFixed(1)}%`
         });
@@ -114,5 +114,6 @@ export function use_event_history(
     thresholds.spike_error_threshold
   ]);
 
+  // return full history (we page it in the UI)
   return events;
 }
