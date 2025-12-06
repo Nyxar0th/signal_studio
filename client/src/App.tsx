@@ -164,9 +164,12 @@ function App() {
   }, [settings]);
 
   const signals_mock = use_random_signal_updates();
+
+  const ws_url = import.meta.env.VITE_WS_URL || "ws://localhost:8080";
+
   const { signals: signals_live } = use_signal_stream(
-    "ws://localhost:8080",
-    mode === "live"
+  ws_url,
+  mode === "live"
   );
 
   const is_live = mode === "live";

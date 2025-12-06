@@ -53,32 +53,58 @@ Dashboard Shell:
 
 ## Architecture
 
-client/ - Vite + React + Tailwind + Framer Motion
-server/ - Node WebSocket server (mock signal stream)
+client/ – Vite + React + Tailwind + Framer Motion  
+server/ – Node WebSocket server (mock signal stream)
 
 ## Local Development
 
-Start WebSocket server:
-cd server
-npm install
-npm run dev
+### Start WebSocket server
+cd server  
+npm install  
+npm run dev  
 
-Start client:
-cd client
-npm install
-npm run dev
+Runs at: ws://localhost:8080
+
+### Start client
+cd client  
+npm install  
+npm run dev  
+
+Open http://localhost:5173
+
+### Switch between live & mock mode
+Use the toggle in the header (Mock / Live).
 
 ## Build
 
-cd client
+cd client  
 npm run build
+
+Output is in client/dist.
 
 ## Deployment
 
-Client:
-- Deploy client/ to Vercel
-- Set env var VITE_WS_URL=wss://yourserver.com
+### Client (Vercel)
+- Deploy the client folder as a Vite project  
+- Add env var: VITE_WS_URL=wss://your-production-websocket-url  
 
-Server:
-- Deploy server/ to Railway or Render
-- Expose WebSocket port 8080
+### Server (Railway or Render)
+- Deploy the Node WebSocket server  
+- Expose port 8080  
+- This becomes your production WebSocket URL  
+
+## Environment Variables
+
+Create `client/.env` when deploying:
+
+VITE_WS_URL=wss://your-production-websocket-url
+
+If not set, the client defaults to:
+
+ws://localhost:8080
+
+## License
+
+MIT License
+
+"""
