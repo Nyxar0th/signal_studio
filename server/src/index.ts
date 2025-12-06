@@ -17,7 +17,7 @@ interface Signal_batch_message {
   signals: Signal_payload[];
 }
 
-const port = 8080;
+const port = Number(process.env.PORT) || 8080;
 
 const signal_ids = [
   "auth_service",
