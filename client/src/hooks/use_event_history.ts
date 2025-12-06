@@ -16,12 +16,25 @@ export interface Event_thresholds {
   spike_error_threshold: number;
 }
 
+const MAX_EVENTS = 200;
+
 export function use_event_history(
   signals: Signal[],
   thresholds: Event_thresholds
 ) {
   const [events, set_events] = useState<Signal_event[]>([]);
   const prev_ref = useRef<Record<string, Signal> | null>(null);
+
+  // helper to add event and trim list
+  const push_event = (event: Signal_event) => {
+    set_events((old) => {
+      const next = [event, ...old];
+      if (next.length > MAX_EVENTS) {
+        return next.slice(0, MAX_EVENTS);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!signals.length) return;
@@ -37,17 +50,14 @@ export function use_event_history(
 
       // status change
       if (prev.status !== signal.status) {
-        set_events((old) => [
-          {
-            id: crypto.randomUUID(),
-            signal_id: signal.id,
-            label: signal.label,
-            timestamp: Date.now(),
-            type: "status_change",
-            note: `${prev.status} → ${signal.status}`
-          },
-          ...old
-        ]);
+        push_event({
+          id: crypto.randomUUID(),
+          signal_id: signal.id,
+          label: signal.label,
+          timestamp: Date.now(),
+          type: "status_change",
+          note: `${prev.status} → ${signal.status}`
+        });
       }
 
       // load spike
@@ -55,17 +65,14 @@ export function use_event_history(
         signal.load_pct >= thresholds.spike_load_threshold &&
         prev.load_pct < thresholds.spike_load_threshold
       ) {
-        set_events((old) => [
-          {
-            id: crypto.randomUUID(),
-            signal_id: signal.id,
-            label: signal.label,
-            timestamp: Date.now(),
-            type: "spike_load",
-            note: `Load spiked to ${signal.load_pct}%`
-          },
-          ...old
-        ]);
+        push_event({
+          id: crypto.randomUUID(),
+          signal_id: signal.id,
+          label: signal.label,
+          timestamp: Date.now(),
+          type: "spike_load",
+          note: `Load spiked to ${signal.load_pct}%`
+        });
       }
 
       // latency spike
@@ -73,17 +80,14 @@ export function use_event_history(
         signal.latency_ms >= thresholds.spike_latency_threshold &&
         prev.latency_ms < thresholds.spike_latency_threshold
       ) {
-        set_events((old) => [
-          {
-            id: crypto.randomUUID(),
-            signal_id: signal.id,
-            label: signal.label,
-            timestamp: Date.now(),
-            type: "spike_latency",
-            note: `Latency reached ${signal.latency_ms} ms`
-          },
-          ...old
-        ]);
+        push_event({
+          id: crypto.randomUUID(),
+          signal_id: signal.id,
+          label: signal.label,
+          timestamp: Date.now(),
+          type: "spike_latency",
+          note: `Latency reached ${signal.latency_ms} ms`
+        });
       }
 
       // error spike
@@ -91,22 +95,24 @@ export function use_event_history(
         signal.error_rate >= thresholds.spike_error_threshold &&
         prev.error_rate < thresholds.spike_error_threshold
       ) {
-        set_events((old) => [
-          {
-            id: crypto.randomUUID(),
-            signal_id: signal.id,
-            label: signal.label,
-            timestamp: Date.now(),
-            type: "spike_error",
-            note: `Error spike: ${signal.error_rate.toFixed(1)}%`
-          },
-          ...old
-        ]);
+        push_event({
+          id: crypto.randomUUID(),
+          signal_id: signal.id,
+          label: signal.label,
+          timestamp: Date.now(),
+          type: "spike_error",
+          note: `Error spike: ${signal.error_rate.toFixed(1)}%`
+        });
       }
     });
 
     prev_ref.current = next_map;
-  }, [signals, thresholds.spike_load_threshold, thresholds.spike_latency_threshold, thresholds.spike_error_threshold]);
+  }, [
+    signals,
+    thresholds.spike_load_threshold,
+    thresholds.spike_latency_threshold,
+    thresholds.spike_error_threshold
+  ]);
 
   return events;
 }
